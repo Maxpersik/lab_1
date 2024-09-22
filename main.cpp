@@ -13,6 +13,8 @@ struct Pipe {
     double length = 0;
     double diameter = 0;
     bool repairStatus = false;
+    //string pipeText[3] =
+
     
     void readFromConsole() {
         cout << "Введите название трубы: ";
@@ -42,7 +44,7 @@ struct Pipe {
     }
     
     void loadFromFile() {
-    }
+    };
 };
 
 struct CS {
@@ -108,26 +110,25 @@ bool isNumber(const std::string& s)
         s.end(), [](unsigned char c) { return !std::isdigit(c); }) == s.end();
 }
 
-long numberOrNull(const string& command, const long& value){
+long numberOrDefault(const string& command){
     if (isNumber(command)) {
-        long value = strtol(command.c_str(), NULL, 10);
+        return strtol(command.c_str(), NULL, 10);
     }
-    return value;
+    return -1;
 }
-
 
 int main() {
     Pipe pipe;
     CS cs;
     string command;
-    long value = 0;
+    long value;
     
     while (true) {
         menuDisplay();
         cout << "Выберите команду: ";
         cin >> command;
 
-        numberOrNull(command, value);
+        value = numberOrDefault(command);
         
         switch (value) {
         case 1:
@@ -157,9 +158,9 @@ int main() {
         case 0:
             cout << "Выход из программы." << endl;
             return 0;
-        default:
+        default: // -1
             cout << "Неверный выбор, попробуйте снова." << endl;
             continue;
         }
     }
-}
+} 
