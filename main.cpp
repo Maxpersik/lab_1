@@ -1,9 +1,12 @@
 #include <iostream>
 #include <string>
 #include <fstream>
+#include <cstdlib>  // Для strtol
+
 
 using namespace std;
-void checkInt(string type);
+
+
 
 struct Pipe {
     string name;
@@ -12,12 +15,17 @@ struct Pipe {
     bool repairStatus = false;
     
     void readFromConsole() {
-        cout << "Введите название трубы: " << endl;
+        cout << "Введите название трубы: ";
         cin.ignore();
         getline(cin, name);
-        checkInt("Введите количество цехов: ");
         
+        cout << "Введите длину трубы(в км): ";
+        cin >> length;
         
+        cout << "Введите диаметр трубы(в мм): ";
+        cin >> diameter;
+        
+        repairStatus = false;
     }
     
     void writeToConsole() {
@@ -39,14 +47,30 @@ struct Pipe {
 
 struct CS {
     string name;
-    double workshopNumber;
-    double workshopNumberInWork;
-    double efficiency;
+    int workshopNumber;
+    int workshopNumberInWork;
+    int efficiency;
 
     void readFromConsole() {
+        cout << "Введите название станции: ";
+        cin.ignore();
+        getline(cin, name);
+        
+        cout << "Введите количество цехов: ";
+        cin >> workshopNumber;
+        
+        cout << "Введите количество цехов в работе: ";
+        cin >> workshopNumberInWork;
+        
+        cout << "Введите Эффективность(в %): ";
+        cin >> efficiency;
     }
     
     void writeToConsole() {
+        cout << "Название трубы: " << name << endl;
+        cout << "Количество цехов:" << workshopNumber << endl;
+        cout << "Количество цехов в работе: " << workshopNumberInWork << endl;
+        cout << "Эффективность(в %)" << efficiency << endl;
     }
     
     void editWorkshop() {
@@ -75,31 +99,37 @@ void menuDisplay() {
     cout << " 6 - Сохранить              " << endl;
     cout << " 7 - Загрузить              " << endl;
     cout << " 0 - Выход                  " << endl;
+    cout << "                   " << endl;
 }
 
-void checkInt(string type) {
-    int numb;
-    while (true) {
-        cout << type << endl;
-        cin >> numb;
-        if (numb < 0) {
-            cout << numb << endl;
-            break;
-        }
-    }
+bool isNumber(const std::string& s)
+{
+    return !s.empty() && std::find_if(s.begin(),
+        s.end(), [](unsigned char c) { return !std::isdigit(c); }) == s.end();
 }
+
+long numberOrNull(const string& command, const long& value){
+    if (isNumber(command)) {
+        long value = strtol(command.c_str(), NULL, 10);
+    }
+    return value;
+}
+
 
 int main() {
     Pipe pipe;
     CS cs;
-    int command;
+    string command;
+    long value = 0;
     
     while (true) {
         menuDisplay();
         cout << "Выберите команду: ";
         cin >> command;
+
+        numberOrNull(command, value);
         
-        switch (command) {
+        switch (value) {
         case 1:
             pipe.readFromConsole();
             break;
@@ -117,11 +147,11 @@ int main() {
             cs.editWorkshop();
             break;
         case 6: {
-
+            pipe.saveToFile();
             break;
         }
         case 7: {
-
+            
             break;
         }
         case 0:
@@ -129,7 +159,7 @@ int main() {
             return 0;
         default:
             cout << "Неверный выбор, попробуйте снова." << endl;
-            break;
+            continue;
         }
     }
 }
