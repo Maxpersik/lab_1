@@ -38,6 +38,13 @@ struct Pipe {
     }
      
     void editRepairStatus() {
+        if (name.length() > 0) {
+            repairStatus == !repairStatus;
+            cout << "Ремонтный статус изменен на:" << (repairStatus ? "Да" : "Нет") << endl;
+        }
+        else {
+            cout << "Создайте трубу, объект не существует" << endl;
+        }
     }
     
     void saveToFile() {
@@ -106,7 +113,7 @@ void menuDisplay() {
 
 bool isNumber(const std::string& s)
 {
-    return !s.empty() && std::find_if(s.begin(),
+    return  s.length() < 2 and !s.empty() && std::find_if(s.begin(),
         s.end(), [](unsigned char c) { return !std::isdigit(c); }) == s.end();
 }
 
@@ -126,7 +133,10 @@ int main() {
     while (true) {
         menuDisplay();
         cout << "Выберите команду: ";
-        cin >> command;
+        //cin >> command;
+        //cin.ignore();
+        getline(cin, command);
+        //cout << command << endl;
 
         value = numberOrDefault(command);
         
@@ -152,7 +162,7 @@ int main() {
             break;
         }
         case 7: {
-            
+            pipe.loadFromFile();
             break;
         }
         case 0:
@@ -163,4 +173,4 @@ int main() {
             continue;
         }
     }
-} 
+}
