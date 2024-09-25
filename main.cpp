@@ -31,10 +31,19 @@ struct Pipe {
     }
     
     void writeToConsole() {
-        cout << "Название трубы: " << name << endl;
-        cout << "Длина трубы(в км): " << length << endl;
-        cout << "Диаметр(в мм): " << diameter << endl;
-        cout << "Ремонтный статус: " << (repairStatus ? "Да" : "Нет") << endl;
+        if (length > 0) {
+            cout << " " << endl;
+            cout << "Название трубы: " << name << endl;
+            cout << "Длина трубы(в км): " << length << endl;
+            cout << "Диаметр(в мм): " << diameter << endl;
+            cout << "Ремонтный статус: " << (repairStatus ? "Да" : "Нет") << endl;
+            cout << " " << endl;
+        }
+        else {
+            cout << " " << endl;
+            cout << "Труба не создана" << name << endl;;
+            cout << " " << endl;
+        }
     }
      
     void editRepairStatus() {
@@ -76,19 +85,50 @@ struct CS {
     }
     
     void writeToConsole() {
-        cout << "Название трубы: " << name << endl;
-        cout << "Количество цехов:" << workshopNumber << endl;
-        cout << "Количество цехов в работе: " << workshopNumberInWork << endl;
-        cout << "Эффективность(в %)" << efficiency << endl;
+        if (name.empty()) {
+            cout << "КС не создана" << endl;
+            cout << " " << endl;
+        }
+        else {
+            cout << "Название станции: " << name << endl;
+            cout << "Количество цехов:" << workshopNumber << endl;
+            cout << "Количество цехов в работе: " << workshopNumberInWork << endl;
+            cout << "Эффективность(в %)" << efficiency << endl;
+            cout << " " << endl;
+        }
     }
     
     void editWorkshop() {
-    }
-    
-    void startWorkshop() {
-    }
-    
-    void stopWorkshop() {
+        int command;
+        cout << " 1 - Запустить цех  " << endl;
+        cout << " 2 - Остановить цех " << endl;
+        cout << " Выберете действие: ";
+
+        cin >> command;
+        switch (command) {
+            case 1:
+                if (workshopNumber > workshopNumberInWork) {
+                    workshopNumberInWork++;
+                    cout << "Еще один цех запущен" << endl;
+                    cout << "Теперь в работе " << workshopNumberInWork << " из " << workshopNumber << " цехов " << endl;
+                }
+                else {
+                    cout << "Все цехи запущены" << endl;
+                }
+                break;
+            case 2:
+                if (0 < workshopNumberInWork) {
+                    workshopNumberInWork--;
+                    cout << "Цех остановлен" << endl;
+                    cout << "Теперь в работе " << workshopNumberInWork << " из " << workshopNumber << " цехов" << endl;
+                }
+                else {
+                    cout << "Все цехи запущены" << endl;
+                }
+                break;
+            default: // -1
+                cout << "Неверный выбор, попробуйте снова." << endl;
+        }
     }
     
     void saveToFile() {
@@ -111,6 +151,14 @@ void menuDisplay() {
     cout << "                   " << endl;
 }
 
+//int chechNumber(const int& a, const int& b)
+//{
+//    while (condition) {
+//        statements
+//    }
+//    return 0;
+//}
+
 bool isNumber(const std::string& s)
 {
     return  s.length() < 2 and !s.empty() && std::find_if(s.begin(),
@@ -121,6 +169,7 @@ long numberOrDefault(const string& command){
     if (isNumber(command)) {
         return strtol(command.c_str(), NULL, 10);
     }
+    //cout << "Ошибка";
     return -1;
 }
 
@@ -133,12 +182,14 @@ int main() {
     while (true) {
         menuDisplay();
         cout << "Выберите команду: ";
-        //cin >> command;
+        //cin >> command;4
         //cin.ignore();
+        cin.ignore();
         getline(cin, command);
         //cout << command << endl;
 
         value = numberOrDefault(command);
+        //cout << value << endl;
         
         switch (value) {
         case 1:
