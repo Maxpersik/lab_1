@@ -3,10 +3,7 @@
 #include <fstream>
 #include <cstdlib>  // Для strtol
 
-
 using namespace std;
-
-
 
 struct Pipe {
     string name;
@@ -48,7 +45,7 @@ struct Pipe {
      
     void editRepairStatus() {
         if (name.length() > 0) {
-            repairStatus == !repairStatus;
+            repairStatus = !repairStatus;
             cout << "Ремонтный статус изменен на:" << (repairStatus ? "Да" : "Нет") << endl;
         }
         else {
@@ -56,11 +53,6 @@ struct Pipe {
         }
     }
     
-    void saveToFile() {
-    }
-    
-    void loadFromFile() {
-    };
 };
 
 struct CS {
@@ -131,11 +123,6 @@ struct CS {
         }
     }
     
-    void saveToFile() {
-    }
-    
-    void loadFromFile() {
-    }
 };
 
 void menuDisplay() {
@@ -173,6 +160,63 @@ long numberOrDefault(const string& command){
     return -1;
 }
 
+
+void saveToFile(const Pipe& pipe, const CS& cs) {
+    ofstream outFile("data.txt");
+    if (outFile.is_open()) {
+        // Сохраняем данные о трубе
+        if (!pipe.name.empty()) {
+            outFile << "PIPE" << endl;
+            outFile << pipe.name << endl;
+            outFile << pipe.length << endl;
+            outFile << pipe.diameter << endl;
+            outFile << pipe.repairStatus << endl;
+        }
+
+        // Сохраняем данные о КС
+        if (!cs.name.empty()) {
+            outFile << "CS" << endl;
+            outFile << cs.name << endl;
+            outFile << cs.workshopNumber << endl;
+            outFile << cs.workshopNumberInWork << endl;
+            outFile << cs.efficiency << endl;
+        }
+
+        outFile.close();
+        cout << "Данные сохранены в файл data.txt" << endl;
+    } else {
+        cout << "Не удалось открыть файл для записи" << endl;
+    }
+}
+
+void loadFromFile(Pipe& pipe, CS& cs) {
+    ifstream inFile("data.txt");
+    if (inFile.is_open()) {
+        string line;
+        while (getline(inFile, line)) {
+            if (line == "PIPE") {
+                // Загружаем данные о трубе
+                getline(inFile, pipe.name);
+                inFile >> pipe.length;
+                inFile >> pipe.diameter;
+                inFile >> pipe.repairStatus;
+                inFile.ignore(); // Пропускаем оставшийся символ новой строки
+            } else if (line == "CS") {
+                // Загружаем данные о КС
+                getline(inFile, cs.name);
+                inFile >> cs.workshopNumber;
+                inFile >> cs.workshopNumberInWork;
+                inFile >> cs.efficiency;
+                inFile.ignore(); // Пропускаем оставшийся символ новой строки
+            }
+        }
+        inFile.close();
+        cout << "Данные загружены из файла data.txt" << endl;
+    } else {
+        cout << "Не удалось открыть файл для чтения" << endl;
+    }
+}
+
 int main() {
     Pipe pipe;
     CS cs;
@@ -208,14 +252,12 @@ int main() {
         case 5:
             cs.editWorkshop();
             break;
-        case 6: {
-            pipe.saveToFile();
+        case 6:
+            saveToFile(pipe, cs);
             break;
-        }
-        case 7: {
-            pipe.loadFromFile();
+        case 7:
+            loadFromFile(pipe, cs);
             break;
-        }
         case 0:
             cout << "Выход из программы." << endl;
             return 0;
