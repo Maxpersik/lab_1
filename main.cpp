@@ -2,8 +2,49 @@
 #include <string>
 #include <fstream>
 #include <cstdlib>  // Для strtol
+#include <sstream>  // Для stringstream
+#include <limits>   // Для numeric_limits
 
 using namespace std;
+
+int inputIntInRange(const string& prompt, int minValue, int maxValue) {
+    int value;
+    while (true) {
+        cout << prompt;
+        string input;
+        getline(cin, input);
+        stringstream ss(input);
+        if (ss >> value && ss.eof()) {
+            if (value >= minValue && value <= maxValue) {
+                return value;
+            } else {
+                cout << "Ошибка: введите число от " << minValue << " до " << maxValue << "." << endl;
+            }
+        } else {
+            cout << "Ошибка: введите корректное целое число." << endl;
+        }
+    }
+}
+
+// Функция для ввода числа с плавающей точкой с проверкой и диапазоном
+double inputDoubleInRange(const string& prompt, double minValue, double maxValue) {
+    double value;
+    while (true) {
+        cout << prompt;
+        string input;
+        getline(cin, input);
+        stringstream ss(input);
+        if (ss >> value && ss.eof()) {
+            if (value >= minValue && value <= maxValue) {
+                return value;
+            } else {
+                cout << "Ошибка: введите число от " << minValue << " до " << maxValue << "." << endl;
+            }
+        } else {
+            cout << "Ошибка: введите корректное число." << endl;
+        }
+    }
+}
 
 struct Pipe {
     string name;
@@ -18,11 +59,14 @@ struct Pipe {
         cin.ignore();
         getline(cin, name);
         
-        cout << "Введите длину трубы(в км): ";
-        cin >> length;
+        //cout << "Введите длину трубы(в км): ";
+        //cin >> length;
         
-        cout << "Введите диаметр трубы(в мм): ";
-        cin >> diameter;
+        //cout << "Введите диаметр трубы(в мм): ";
+        //cin >> diameter;
+        
+        length = inputDoubleInRange("Введите длину трубы (в км): ", 0.1, 10000);
+        diameter = inputDoubleInRange("Введите диаметр трубы (в мм): ", 10, 10000);
         
         repairStatus = false;
     }
@@ -66,14 +110,20 @@ struct CS {
         cin.ignore();
         getline(cin, name);
         
-        cout << "Введите количество цехов: ";
-        cin >> workshopNumber;
+        //cout << "Введите количество цехов: ";
+        //cin >> workshopNumber;
+        //numberInRange(workshopNumber, 0, 1000)
+        //cin >> workshopNumber;
         
-        cout << "Введите количество цехов в работе: ";
-        cin >> workshopNumberInWork;
+        //cout << "Введите количество цехов в работе: ";
+        //cin >> workshopNumberInWork;
         
-        cout << "Введите Эффективность(в %): ";
-        cin >> efficiency;
+        //cout << "Введите Эффективность(в %): ";
+        //cin >> efficiency;
+        
+        workshopNumber = inputIntInRange("Введите количество цехов: ", 1, 1000);
+        workshopNumberInWork = inputIntInRange("Введите количество цехов в работе: ", 0, workshopNumber);
+        efficiency = inputIntInRange("Введите эффективность (в %): ", 0, 100);
     }
     
     void writeToConsole() {
@@ -161,6 +211,8 @@ long numberOrDefault(const string& command){
 }
 
 
+
+
 void saveToFile(const Pipe& pipe, const CS& cs) {
     ofstream outFile("data.txt");
     if (outFile.is_open()) {
@@ -214,6 +266,18 @@ void loadFromFile(Pipe& pipe, CS& cs) {
         cout << "Данные загружены из файла data.txt" << endl;
     } else {
         cout << "Не удалось открыть файл для чтения" << endl;
+    }
+}
+
+long numberInRange(const string& prompt, long minValue, long maxValue) {
+    long value;
+    while (true) {
+        value = numberOrDefault(prompt);
+        if (value >= minValue && value <= maxValue) {
+            return value;
+        } else {
+            std::cout << "Ошибка: введите число от " << minValue << " до " << maxValue << ". Попробуйте снова." << std::endl;
+        }
     }
 }
 
