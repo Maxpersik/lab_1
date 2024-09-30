@@ -51,20 +51,11 @@ struct Pipe {
     double length = 0;
     double diameter = 0;
     bool repairStatus = false;
-    //string pipeText[3] =
 
     
     void readFromConsole() {
         cout << "Введите название трубы: ";
-        cin.ignore();
         getline(cin, name);
-        
-        //cout << "Введите длину трубы(в км): ";
-        //cin >> length;
-        
-        //cout << "Введите диаметр трубы(в мм): ";
-        //cin >> diameter;
-        
         length = inputDoubleInRange("Введите длину трубы (в км): ", 0.1, 10000);
         diameter = inputDoubleInRange("Введите диаметр трубы (в мм): ", 10, 10000);
         
@@ -77,20 +68,18 @@ struct Pipe {
             cout << "Название трубы: " << name << endl;
             cout << "Длина трубы(в км): " << length << endl;
             cout << "Диаметр(в мм): " << diameter << endl;
-            cout << "Ремонтный статус: " << (repairStatus ? "Да" : "Нет") << endl;
-            cout << " " << endl;
+            cout << "Ремонтный статус: " << (repairStatus ? "Да" : "Нет") << endl << endl;
         }
         else {
             cout << " " << endl;
-            cout << "Труба не создана" << name << endl;;
-            cout << " " << endl;
+            cout << "Труба не создана" << name << endl << endl;
         }
     }
      
     void editRepairStatus() {
         if (name.length() > 0) {
             repairStatus = !repairStatus;
-            cout << "Ремонтный статус изменен на:" << (repairStatus ? "Да" : "Нет") << endl;
+            cout << "Ремонтный статус изменен на: " << (repairStatus ? "Да" : "Нет") << endl;
         }
         else {
             cout << "Создайте трубу, объект не существует" << endl;
@@ -107,19 +96,7 @@ struct CS {
 
     void readFromConsole() {
         cout << "Введите название станции: ";
-        cin.ignore();
         getline(cin, name);
-        
-        //cout << "Введите количество цехов: ";
-        //cin >> workshopNumber;
-        //numberInRange(workshopNumber, 0, 1000)
-        //cin >> workshopNumber;
-        
-        //cout << "Введите количество цехов в работе: ";
-        //cin >> workshopNumberInWork;
-        
-        //cout << "Введите Эффективность(в %): ";
-        //cin >> efficiency;
         
         workshopNumber = inputIntInRange("Введите количество цехов: ", 1, 1000);
         workshopNumberInWork = inputIntInRange("Введите количество цехов в работе: ", 0, workshopNumber);
@@ -128,15 +105,13 @@ struct CS {
     
     void writeToConsole() {
         if (name.empty()) {
-            cout << "КС не создана" << endl;
-            cout << " " << endl;
+            cout << "КС не создана" << endl << endl;
         }
         else {
             cout << "Название станции: " << name << endl;
             cout << "Количество цехов:" << workshopNumber << endl;
             cout << "Количество цехов в работе: " << workshopNumberInWork << endl;
-            cout << "Эффективность(в %)" << efficiency << endl;
-            cout << " " << endl;
+            cout << "Эффективность(в %)" << efficiency << endl << endl;
         }
     }
     
@@ -144,9 +119,9 @@ struct CS {
         int command;
         cout << " 1 - Запустить цех  " << endl;
         cout << " 2 - Остановить цех " << endl;
-        cout << " Выберете действие: ";
 
-        cin >> command;
+        command = inputIntInRange("Выберете действие:", 1, 2);
+        
         switch (command) {
             case 1:
                 if (workshopNumber > workshopNumberInWork) {
@@ -165,7 +140,7 @@ struct CS {
                     cout << "Теперь в работе " << workshopNumberInWork << " из " << workshopNumber << " цехов" << endl;
                 }
                 else {
-                    cout << "Все цехи запущены" << endl;
+                    cout << "Все цехи остановлены" << endl;
                 }
                 break;
             default: // -1
@@ -184,17 +159,8 @@ void menuDisplay() {
     cout << " 5 - Редактировать КС       " << endl;
     cout << " 6 - Сохранить              " << endl;
     cout << " 7 - Загрузить              " << endl;
-    cout << " 0 - Выход                  " << endl;
-    cout << "                   " << endl;
+    cout << " 0 - Выход                  " << endl << endl;
 }
-
-//int chechNumber(const int& a, const int& b)
-//{
-//    while (condition) {
-//        statements
-//    }
-//    return 0;
-//}
 
 bool isNumber(const std::string& s)
 {
@@ -206,7 +172,6 @@ long numberOrDefault(const string& command){
     if (isNumber(command)) {
         return strtol(command.c_str(), NULL, 10);
     }
-    //cout << "Ошибка";
     return -1;
 }
 
@@ -216,7 +181,6 @@ long numberOrDefault(const string& command){
 void saveToFile(const Pipe& pipe, const CS& cs) {
     ofstream outFile("data.txt");
     if (outFile.is_open()) {
-        // Сохраняем данные о трубе
         if (!pipe.name.empty()) {
             outFile << "PIPE" << endl;
             outFile << pipe.name << endl;
@@ -225,7 +189,6 @@ void saveToFile(const Pipe& pipe, const CS& cs) {
             outFile << pipe.repairStatus << endl;
         }
 
-        // Сохраняем данные о КС
         if (!cs.name.empty()) {
             outFile << "CS" << endl;
             outFile << cs.name << endl;
@@ -290,14 +253,10 @@ int main() {
     while (true) {
         menuDisplay();
         cout << "Выберите команду: ";
-        //cin >> command;4
-        //cin.ignore();
-        cin.ignore();
+
         getline(cin, command);
-        //cout << command << endl;
 
         value = numberOrDefault(command);
-        //cout << value << endl;
         
         switch (value) {
         case 1:
@@ -311,7 +270,11 @@ int main() {
             cs.writeToConsole();
             break;
         case 4:
-            pipe.editRepairStatus();
+            if (pipe.name.empty()) {
+                cout << "Труба еще не создана. Сначала добавьте трубу." << endl;
+            } else {
+                pipe.editRepairStatus();
+            }
             break;
         case 5:
             cs.editWorkshop();
