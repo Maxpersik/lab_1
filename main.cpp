@@ -26,7 +26,6 @@ int inputIntInRange(const string& prompt, int minValue, int maxValue) {
     }
 }
 
-// Функция для ввода числа с плавающей точкой с проверкой и диапазоном
 double inputDoubleInRange(const string& prompt, double minValue, double maxValue) {
     double value;
     while (true) {
@@ -100,7 +99,7 @@ struct CS {
         
         workshopNumber = inputIntInRange("Введите количество цехов: ", 1, 1000);
         workshopNumberInWork = inputIntInRange("Введите количество цехов в работе: ", 0, workshopNumber);
-        efficiency = inputIntInRange("Введите эффективность (в %): ", 0, 100);
+        efficiency = inputIntInRange("Введите эффективность (в %): ", 0.01, 100);
     }
     
     void writeToConsole() {
@@ -205,6 +204,10 @@ void saveToFile(const Pipe& pipe, const CS& cs) {
 }
 
 void loadFromFile(Pipe& pipe, CS& cs) {
+    int a;
+    int b;
+    double c;
+    string name;
     ifstream inFile("data.txt");
     if (inFile.is_open()) {
         string line;
@@ -234,28 +237,68 @@ void loadFromFile(Pipe& pipe, CS& cs) {
                     }
 
                 } else if (line == "CS") {
-                    getline(inFile, cs.name);
-
+//                    getline(inFile, cs.name);
+//
+//                    getline(inFile, line);
+//                    cs.workshopNumber = stoi(line);
+//
+//                    getline(inFile, line);
+//                    cs.workshopNumberInWork = stoi(line);
+//
+//                    getline(inFile, line);
+//                    cs.efficiency = stoi(line);
+                    
+                    getline(inFile, name);
                     getline(inFile, line);
-                    cs.workshopNumber = stoi(line);
-
+                    a = stoi(line);
+                    
                     getline(inFile, line);
-                    cs.workshopNumberInWork = stoi(line);
-
+                    b = stoi(line);
+                    
                     getline(inFile, line);
-                    cs.efficiency = stoi(line);
+                    c = stoi(line);
 
-                    if (cs.workshopNumber < 1 || cs.workshopNumber > 1000) {
+//                    if (cs.workshopNumber < 1 || cs.workshopNumber > 1000) {
+//                        cerr << "Ошибка: количество цехов из файла некорректно." << endl;
+//                        inFile.close();
+//                        return;
+//                    } else {
+//                        
+//                    }
+//                    if (cs.workshopNumberInWork < 1 || cs.workshopNumberInWork > cs.workshopNumber) {
+//                        cerr << "Ошибка: количество рабочих цехов из файла некорректно." << endl;
+//                        inFile.close();
+//                        return;
+//                    }
+//                    if (cs.efficiency < 0.1 || cs.efficiency > 100) {
+//                        cerr << "Ошибка: эффективность из файла некорректна." << endl;
+//                        inFile.close();
+//                        return;
+//                    }
+                    if (a > 1 and a < 1000 and b > 1 and b < a and c > 0.1 and c < 100) {
+                        getline(inFile, cs.name);
+    
+                        getline(inFile, line);
+                        cs.workshopNumber = stoi(line);
+    
+                        getline(inFile, line);
+                        cs.workshopNumberInWork = stoi(line);
+    
+                        getline(inFile, line);
+                        cs.efficiency = stoi(line);
+                    }
+                        
+                    if (a < 1 || a > 1000) {
                         cerr << "Ошибка: количество цехов из файла некорректно." << endl;
                         inFile.close();
                         return;
                     }
-                    if (cs.workshopNumberInWork < 0 || cs.workshopNumberInWork > cs.workshopNumber) {
+                    if (cs.workshopNumberInWork < 1 || cs.workshopNumberInWork > cs.workshopNumber) {
                         cerr << "Ошибка: количество рабочих цехов из файла некорректно." << endl;
                         inFile.close();
                         return;
                     }
-                    if (cs.efficiency < 0 || cs.efficiency > 100) {
+                    if (cs.efficiency < 0.1 || cs.efficiency > 100) {
                         cerr << "Ошибка: эффективность из файла некорректна." << endl;
                         inFile.close();
                         return;
@@ -263,6 +306,8 @@ void loadFromFile(Pipe& pipe, CS& cs) {
                 }
             } catch (const invalid_argument& e) {
                 cerr << "Ошибка: некорректный формат данных в файле." << endl;
+                pipe.name = "";
+                cs.name = "";
                 inFile.close();
                 return;
             } catch (const out_of_range& e) {
