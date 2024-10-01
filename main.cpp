@@ -186,7 +186,7 @@ void saveToFile(const Pipe& pipe, const CS& cs) {
             outFile << pipe.name << endl;
             outFile << pipe.length << endl;
             outFile << pipe.diameter << endl;
-            outFile << pipe.repairStatus << endl;
+            outFile << (pipe.repairStatus ? "1" : "0") << endl;
         }
 
         if (!cs.name.empty()) {
@@ -209,20 +209,66 @@ void loadFromFile(Pipe& pipe, CS& cs) {
     if (inFile.is_open()) {
         string line;
         while (getline(inFile, line)) {
-            if (line == "PIPE") {
-                // Загружаем данные о трубе
-                getline(inFile, pipe.name);
-                inFile >> pipe.length;
-                inFile >> pipe.diameter;
-                inFile >> pipe.repairStatus;
-                inFile.ignore(); // Пропускаем оставшийся символ новой строки
-            } else if (line == "CS") {
-                // Загружаем данные о КС
-                getline(inFile, cs.name);
-                inFile >> cs.workshopNumber;
-                inFile >> cs.workshopNumberInWork;
-                inFile >> cs.efficiency;
-                inFile.ignore(); // Пропускаем оставшийся символ новой строки
+            try {
+                if (line == "PIPE") {
+                    getline(inFile, pipe.name);
+
+                    getline(inFile, line);
+                    pipe.length = stod(line);
+
+                    getline(inFile, line);
+                    pipe.diameter = stod(line);
+
+                    getline(inFile, line);
+                    pipe.repairStatus = (line == "1") ? true : false;
+
+                    if (pipe.length < 0.1 || pipe.length > 10000) {
+                        cerr << "Ошибка: длина трубы из файла некорректна." << endl;
+                        inFile.close();
+                        return;
+                    }
+                    if (pipe.diameter < 10 || pipe.diameter > 10000) {
+                        cerr << "Ошибка: диаметр трубы из файла некорректен." << endl;
+                        inFile.close();
+                        return;
+                    }
+
+                } else if (line == "CS") {
+                    getline(inFile, cs.name);
+
+                    getline(inFile, line);
+                    cs.workshopNumber = stoi(line);
+
+                    getline(inFile, line);
+                    cs.workshopNumberInWork = stoi(line);
+
+                    getline(inFile, line);
+                    cs.efficiency = stoi(line);
+
+                    if (cs.workshopNumber < 1 || cs.workshopNumber > 1000) {
+                        cerr << "Ошибка: количество цехов из файла некорректно." << endl;
+                        inFile.close();
+                        return;
+                    }
+                    if (cs.workshopNumberInWork < 0 || cs.workshopNumberInWork > cs.workshopNumber) {
+                        cerr << "Ошибка: количество рабочих цехов из файла некорректно." << endl;
+                        inFile.close();
+                        return;
+                    }
+                    if (cs.efficiency < 0 || cs.efficiency > 100) {
+                        cerr << "Ошибка: эффективность из файла некорректна." << endl;
+                        inFile.close();
+                        return;
+                    }
+                }
+            } catch (const invalid_argument& e) {
+                cerr << "Ошибка: некорректный формат данных в файле." << endl;
+                inFile.close();
+                return;
+            } catch (const out_of_range& e) {
+                cerr << "Ошибка: значение из файла выходит за пределы допустимого диапазона." << endl;
+                inFile.close();
+                return;
             }
         }
         inFile.close();
